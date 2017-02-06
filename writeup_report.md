@@ -1,12 +1,12 @@
 #**Behavioral Cloning** 
 
-##Writeup Template
+##Background
 
-###You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
+This repository contains my project report for the Udacity Self-Driving Car nano-degree (https://www.udacity.com/drive) program's project 3 - Behavioral Cloning. The original starting files and instructions can be found in https://github.com/udacity/CarND-Behavioral-Cloning-P3.git.
 
 ---
 
-**Behavrioal Cloning Project**
+**Behavioral Cloning Project**
 
 The goals / steps of this project are the following:
 * Use the simulator to collect data of good driving behavior
@@ -18,10 +18,10 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./examples/placeholder.png "Model Visualization"
-[image2]: ./examples/placeholder.png "Grayscaling"
-[image3]: ./examples/placeholder_small.png "Recovery Image"
-[image4]: ./examples/placeholder_small.png "Recovery Image"
+[image1]: ./res/keras_model_summary.png "Model Summary"
+[image2]: ./res/driving-data-stats.png "Grayscaling"
+[image3]: ./res/left_center_right_camera_images.png "Recovery Image"
+[image4]: ./res/example_pre-processing.png "Recovery Image"
 [image5]: ./examples/placeholder_small.png "Recovery Image"
 [image6]: ./examples/placeholder_small.png "Normal Image"
 [image7]: ./examples/placeholder_small.png "Flipped Image"
@@ -127,3 +127,5 @@ After the collection process, I had X number of data points. I then preprocessed
 I finally randomly shuffled the data set and put Y% of the data into a validation set. 
 
 I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
+
+<video src="./res/run1.mp4" width="320" height="200" controls preload></video>
