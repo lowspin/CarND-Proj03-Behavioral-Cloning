@@ -19,11 +19,10 @@ The goals / steps of this project are the following:
 [//]: # (Image References)
 
 [image1]: ./res/keras_model_summary.png "Model Summary"
-[image2]: ./res/driving-data-stats.png "Visualize udacity's drivingn data"
+[image2]: ./res/driving-data-stats.png "Visualize udacity's driving data"
 [image3]: ./res/sterring_histogram.png "steering angle histogram"
 [image4]: ./res/left_center_right_camera_images.png "Sample left, center and right camera images"
 [image5]: ./res/example_pre-processing.png "Sample pre-processing for each frame"
-
 
 ## Rubric Points
 ###Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
@@ -55,7 +54,63 @@ The model.py file contains the code for training and saving the convolution neur
 
 ####1. An appropriate model arcthiecture has been employed
 
-My model is based on the original Nvidia paper ["End to End Learning for Self-Driving Cars"](https://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf). 
+My model is based on the original Nvidia paper ["End to End Learning for Self-Driving Cars"](https://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf). Drop-out and L2-regularization were added to prevent over-fitting. (Please see details about the final model architecture in the next section below).
+
+As this is a regression problem, the loss was defined as the mean squared error between the predicted and recorded steering angle is used as the main optimization objective.
+
+####2. Attempts to reduce overfitting in the model
+
+The model contains dropout layers in order to reduce overfitting (model.py lines 184). 
+
+L2-Regularizers were added in each of the full-connected layers.
+
+The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
+
+####3. Model parameter tuning
+
+The model used an adam optimizer, the initial learning rate was tuned manually (model.py line 192). 
+
+Batch size is set with the Keras ImageDataGenerator and is set by trial and error. (model.py line 202)
+
+Similarly, number of Epochs set in Keras model.fit_generator is set by trial and error, the entire training set was used in each Epoch. (model.py line 204)
+
+Finally, as a balance between convergence speed and accuracy, I settled on:
+- initial learning rate of 0.0001, 
+- batch size of 128,
+- 50 Epochs
+
+####4. Appropriate training data
+
+Initially, I collected my own training data (attached [training01.zip](training01.zip)) using the Udacity simulator on track 1. However, I found that the track has very few right bends/turns. As a result, I have to drive many round to have sufficient positive steering angle samples. I could flip the negative steering images and invert the sign of the steering angle to get more positive value samples, or drive the circuit in reverse. In the end, I chose to use the Udacity provided driving data, which has a fairly even distribution between positive and negative steering samples, to train my network.
+
+Training data was chosen to keep the vehicle driving on the road. I used a combination of images from the center, left and right cameras, with a heuristic weighing to exclude selective data.
+
+For details about how I created the training data, see the next section. 
+
+###Model Architecture and Training Strategy
+
+####1. Solution Design Approach
+
+The overall strategy for deriving a model architecture was to start with an established working model and tweak hyper-parameters. Emphasis is placed on training data selection to achieve required accuracy.
+
+My first step was to use a convolution neural network model similar to the Nvidia paper ["End to End Learning for Self-Driving Cars"](https://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf). I thought this model might be appropriate because is was used for a autonomous driving application using only camera images, which is exactly what we're trying to do.
+
+In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. I used the train_test_split function from sklearn.model_selection to perform a random split (model.py line 168).
+
+To combat the overfitting, I modified the model as follows. 
+- Drop-out with keep probability 0.5. This was applied after the convolution neural network, before the fully connected layers. (model.py line184) 
+- L2-regularization is also added to all the weights in the fully connected layers, with varying weights depending on the depth of the layer. (model.py lines 186-188)
+
+Then I fine-tune the intial learning rate of the ADAM optimizer, by manually adjusting a few values (0.01, 0.005, 0.001, 0.0005, 0.0001 etc) and observing the autonomous driving results (model.py line 192)
+
+The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track, especially in sharp bends. To improve the driving behavior in these cases, I went back to the training data and select samples with a more intentionally designed criteria (see below).
+
+At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
+
+####2. Final Model Architecture
+
+The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers and layer sizes.
+
 The first part consists of a convolution neural network with 5x5 and 3x3 filter sizes and depths between 24 and 64 (model.py lines 175-189):
 - a 3-channel input convolutional layer (convolution2D), with 5x5 kernel of depth 24, stride (2,2), relu activation and normatou initialization
 - a hidden convolutional layer, with 5x5 kernel of depth 36, stride (2,2), relu activation and normal initialization
@@ -70,78 +125,66 @@ The features extracted from the CNN is flattened, added drop-out, then applied t
 
 The model includes RELU layers to introduce nonlinearity (code line 20), and the data is normalized using a custom normalization function (model.py lines 146-151)
 
-As this is a regression problem, the loss was defined as the mean squared error between the predicted and recorded steering angle is used as the main optimization objective.
+Here is the model summary of the architecture (note: visualizing the architecture is optional according to the project rubric)
 
-####2. Attempts to reduce overfitting in the model
-
-The model contains dropout layers in order to reduce overfitting (model.py lines 184). 
-
-L2-Regularizers were added in each of the full-connected layers.
-
-The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
-
-####3. Model parameter tuning
-
-The model used an adam optimizer, the learning rate was tuned manually (model.py line 192). Finally, I settled on a learning rate of 0.0001, as a balance between convergence speed and accuracy.
-
-####4. Appropriate training data
-
-Training data was chosen to keep the vehicle driving on the road. I used a combination of images from the center, left and right cameras, with a heuristic weighing to exclude selective data.
-
-For details about how I created the training data, see the next section. 
-
-###Model Architecture and Training Strategy
-
-####1. Solution Design Approach
-
-The overall strategy for deriving a model architecture was to ...
-
-My first step was to use a convolution neural network model similar to the ... I thought this model might be appropriate because ...
-
-In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. I found that my first model had a low mean squared error on the training set but a high mean squared error on the validation set. This implied that the model was overfitting. 
-
-To combat the overfitting, I modified the model so that ...
-
-Then I ... 
-
-The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track... to improve the driving behavior in these cases, I ....
-
-At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
-
-####2. Final Model Architecture
-
-The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers and layer sizes ...
-
-Here is a visualization of the architecture (note: visualizing the architecture is optional according to the project rubric)
-
-![alt text][image1]
+![Model Summary][image1]
 
 ####3. Creation of the Training Set & Training Process
 
-To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving:
+The driving data provided three different camera images, captured from three locations on the windshield. Below is a sample of the left, center and right camera images.
 
-![alt text][image2]
+![camera images][image4]
 
-I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to .... These images show what a recovery looks like starting from ... :
+These are the plots of the steering angle, throttle/brake and resulting speed of the data.
+![Driving data stats][image2]
+Since, we're not adjusting throttle and speed in this project, it is important that the training data is also collected without major changes in throttle and speed. There is a small section where these changes more than usual, but overall, the data looks ok.
 
-![alt text][image3]
-![alt text][image4]
-![alt text][image5]
+As we can see from the histogram of the steering angles, there are a lot more samples with straight road segments (steering angle close to 0)
+![steering angle histogram][image3]
 
-Then I repeated this process on track two in order to get more data points.
+If we bin the steering angles into three sets (model.py lines 64-82):
+- less than -0.05 (left steering)
+- between -0.05 and +0.05 (straight)
+- more than +0.05 (right steering)
 
-To augment the data sat, I also flipped images and angles thinking that this would ... For example, here is an image that has then been flipped:
+We see that the dataset consists of 1532 left steering, 4881 straight and 1623 right steering. If we use these data without filtering, the model will mostly learn how to "drive" (adjust steering angle) on straight segments, without much experience in cruves and bends. To overcome this, I applied a weighting probability to the training images (model.py line 95). Specifically, since the left and right samples are about equal, I apply "select" probabilities of:
+- left steering samples keep probability = 1.0
+- straight steering samples keep probability = 0.5
+- right steering samples keep probability = 1.0
 
-![alt text][image6]
-![alt text][image7]
+Hence, half of the straight steering samples were dropped.
 
-Etc ....
+In addition, to help with sharp turns and bends, I selectively added left and right camera images as follows:
+- if steering bin is left, add the right camera images, with additional -0.2 added to the original steering angle
+- if steering bin is right, add the left camera images, with additional +0.2 added to the original steering angle
+- if steering bin is straight, no side camera images were added.
 
-After the collection process, I had X number of data points. I then preprocessed this data by ...
+After the data selection, I have the following distribution, which seems appropriate for our training:
+- left steering samples = 3062
+- right steering samples = 3220
+- approx zero steering samples = 2437
 
+####Data augmentation
+I have chosen not to augment the dataset, as the training samples was sufficient. The Keras ImageDataGenerator I'm using can be used to generate additional samples with e.g. horizontal flips, random rotation, shifts and whitening, but it is not clear how to adjust the y labels accordingly using the generator.
 
-I finally randomly shuffled the data set and put Y% of the data into a validation set. 
+####Pre-processing
+After the collection process, I had 8719 number of data points. I then preprocessed this data by:
 
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
+Cropping (model.py lines 136-144):
+In order to use the side camera images as training samples, I have cropped the bottom of the images to remove the "chasis" of the car, which are on different side of the images according to the camera source. In addition, I have also cropped out the top "sky" part of the images. This is both to save on processing and to help with environments the model have not seen before (e.g. track 2), as we ignore these background objects.
 
-<video src="./res/run1.mp4" controls preload></video>
+Normalization (model.py lines 146-153):
+Simple linear normalization is performed to scale each RGB pixel to within -0.5 and +0.5.
+
+The following is an example of an image in each of the pre-processing steps.
+![Pre-processing][image5]
+
+I finally randomly shuffled the data set and put 20% of the data into a validation set. 
+
+I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The number of epochs was chosen as 50 to balance between accuracy and speed.
+
+###Simulation
+After training, the car was able to navigate autonomously around the track without leaving the drivable track surface. (In case there are problems loading the model into the simulator, I have created a video of autonomous driving around [track 1](/res/run1.mp4).
+
+###Reflection
+The biggest lesson I learn from this project is that the deep neural network designed for any particular application is only as good as the data we feed into it. We can spend a lot of time fine-tuning the network, but if we do not select or pre-process the training data appropriately, the result is going to be inaccurate. 
