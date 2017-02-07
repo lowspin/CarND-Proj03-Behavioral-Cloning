@@ -159,6 +159,8 @@ In addition, to help with sharp turns and bends, I selectively added left and ri
 - if steering bin is right, add the left camera images, with additional +0.2 added to the original steering angle
 - if steering bin is straight, no side camera images were added.
 
+Finally, as a pre-caution (from my own experience), I discard the initial period when the car is ramping up to cruising speed, as most of the time, we're reacting to images at constant speed with steering control only.
+
 After the data selection, I have the following distribution, which seems appropriate for our training:
 - left steering samples = 3062
 - right steering samples = 3220
