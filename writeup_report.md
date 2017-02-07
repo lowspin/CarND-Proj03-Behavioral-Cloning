@@ -20,8 +20,9 @@ The goals / steps of this project are the following:
 
 [image1]: ./res/keras_model_summary.png "Model Summary"
 [image2]: ./res/driving-data-stats.png "Visualize udacity's drivingn data"
-[image3]: ./res/left_center_right_camera_images.png "Sample left, center and right camera images"
-[image4]: ./res/example_pre-processing.png "Sample pre-processing for each frame"
+[image3]: ./res/sterring_histogram.png "steering angle histogram"
+[image4]: ./res/left_center_right_camera_images.png "Sample left, center and right camera images"
+[image5]: ./res/example_pre-processing.png "Sample pre-processing for each frame"
 
 
 ## Rubric Points
