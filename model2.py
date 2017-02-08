@@ -203,7 +203,7 @@ print('Assembled ', X_np.shape[0], ' training data, with LCR: ', stats_lcr)
 # 2. For fit_generator(): shuffle and split validation set
 X_train, X_val, y_train, y_val = train_test_split(X_np, y_np, test_size=0.2, random_state=42)
 ############# create CNN in Keras ############
-
+print(X_train.shape[1], X_train.shape[2], X_train.shape[3])
 def create_model2():
     # create baseline model (from keras lab)
     model = Sequential()
@@ -237,7 +237,7 @@ model = create_model2()
 train_datagen = ImageDataGenerator() #horizontal_flip=True)
 train_generator = train_datagen.flow(X_train, y_train, batch_size=64, shuffle=True)
 #samples_per_epoch=X_train.shape[0]
-history = model.fit_generator(train_generator, samples_per_epoch=X_train.shape[0], nb_epoch=50, validation_data=(X_val, y_val))
+#history = model.fit_generator(train_generator, samples_per_epoch=X_train.shape[0], nb_epoch=50, validation_data=(X_val, y_val))
 #history = model.fit(X_train, y_train, batch_size=10, nb_epoch=10, shuffle=True, validation_split=0.2)
 
 ############# train and save model ############
@@ -252,4 +252,4 @@ def save_model(model):
     model.save('model2.h5')
 
 model.summary()
-save_model(model)
+#save_model(model)
