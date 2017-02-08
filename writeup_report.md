@@ -23,6 +23,7 @@ The goals / steps of this project are the following:
 [image3]: ./res/sterring_histogram.png "steering angle histogram"
 [image4]: ./res/left_center_right_camera_images.png "Sample left, center and right camera images"
 [image5]: ./res/example_pre-processing.png "Sample pre-processing for each frame"
+[image6]: ./res/Experiment_temporal_Info.png "Experimental dual frame processing"
 
 ## Rubric Points
 ###Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
@@ -36,9 +37,10 @@ My project includes the following files:
 * model.py - main script to create and train the model
 * mytools.py - containing miscellaneous visualization functions
 * drive.py - for driving the car in autonomous mode
-* model.h5 - containing a trained convolution neural network 
+* model.h5, model.json - containing a trained convolution neural network 
 * writeup_report.md (this file) - summarizing the results
 * /res/run1.mp4 - video generated from autonomous driving around track 1 (in case evaluation fails).
+* model2.py, drive2.py, model2.h5, model2.json - experimental dual-frame mode (see below)
 
 ####2. Submssion includes functional code
 Using the Udacity provided simulator and my drive.py file, the car can be driven autonomously around the track by executing 
@@ -186,7 +188,55 @@ I finally randomly shuffled the data set and put 20% of the data into a validati
 I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The number of epochs was chosen as 50 to balance between accuracy and speed.
 
 ###Simulation
-After training, the car was able to navigate autonomously around the track without leaving the drivable track surface. (In case there are problems loading the model into the simulator, I have created a video of autonomous driving around [track 1](/res/run1.mp4).
+After training, the car was able to navigate autonomously around the track without leaving the drivable track surface. (In case there are problems loading the model into the simulator, I have uploaded a video of autonomous driving around [track 1](/res/run1.mp4).
+
+###Experiment - Dual Frame Processing
+Since we shuffle the images random and train with them as individual samples, none of the temporal information is retained in the training data after assembly and pre-processing. For example, if the car moves from the center to the side of the lane in consecutive frame, the corresponding steering maybe to correct for unintentional swerving, but if the car has been consistently staying one side for consecutive frames and steering is postive or negative, the human driver could be "hugging the bend" while negotiating a curve. 
+
+**Data Assembly**
+To this end, I conducted an experiment to see if we can do better by using some information from the previous frame in the training. My original intention was to expand the input convolution layer to 6 channels - the first 3 layers are the current frame's RGB signal, while the next 3 were the previous frame's. All 6 layers are passed into the CNN and go through similar processing as in the 3 channel case. For a 10Hz simulator, this would add a bit of temporal information from 100ms ago. 
+
+However, I ran into two problems:
+1. The Keras convolution2D layer does not seem to like 6 channels as input - only 1,3,4 were possible when I tried. I did not not have time to try other architecture.
+2. My machine ran out of memory very quickly as large 6 channels numpy arrays needed to be created.
+
+To workaround, I convert the previous frame's data into (single channel) grayscale, and use a 4-layer input, i.e. 1st 3 layers are the current frame's RGB image, and the 4th layer is the previous frame's grayscale image.
+
+![Experimental dual frame mode][image6]
+
+**Model adjustment**
+Since input is increase by 4/3, I increase the depth of all layers by the ratio to accomodate the additional information flowing through. The resulting model is as follows:
+- a *4-channel* input convolutional layer (convolution2D), with 5x5 kernel of depth *32*, stride (2,2), relu activation and normatou initialization
+- a hidden convolutional layer, with 5x5 kernel of depth *48*, stride (2,2), relu activation and normal initialization
+- a hidden convolutional layer, with 5x5 kernel of depth *64*, stride (2,2), relu activation and normal initialization
+- a hidden convolutional layer, with 3x3 kernel of depth *86*, stride (1,1), relu activation and normal initialization
+- a hidden convolutional layer, with 3x3 kernel of depth *86*, stride (1,1), relu activation and normal initialization
+- drop-out with keep probability 0.5
+- fully connected layer 1 with output dimension *134*, relu activation, normal initialization, and L2-regularizers with weight 0.001
+- fully connected layer 2 with output dimension *67*, relu activation, normal initialization, and L2-regularizers with weight 0.005
+- fully connected layer 3 with output dimension *14*, relu activation, normal initialization, and L2-regularizers with weight 0.01
+
+**Files**
+The corresponding files for the experiment are in this repo:
+* model2.py - train and save model using the dual-frame format
+* model2.h5, model2.json - final saved model
+* drive2.py - added a few lines to save the previous frame, convert to grayscale and stack at the bottom of the 4-layer input.
+
+To drive the car autonomously using udacity's simulator, execute
+```sh
+python drive2.py model2.h5
+```
+
+**Current Result**
+Unfortunately, the current result is worse than single frame processing. The car is not yet able to navigate the first track. I think there could be a few reasons for this:
+- the model is not optimal for this new input - more refinement is needed (maybe more layers?) than just merely scaling the number of weights,
+- Just gray-scaling the previous frame is not an optimum way to extract temporal information, may motion vectors could be better,
+- One frame is too short to have any meaningful change in the image,
+
+**Further work**
+I will continue to fine-tune the model, or work with other input data format to improve the performance.
 
 ###Reflection
 The biggest lesson I learn from this project is that the deep neural network designed for any particular application is only as good as the data we feed into it. We can spend a lot of time fine-tuning the network, but if we do not select or pre-process the training data appropriately, the result is going to be inaccurate. 
+
+The second lesson I learn from the experiment is that the deep neural network model should be adapted for the input data as well. In transfer learning, we cannot expect one network that worked on another problem to work seamlessly on our current problem, without any addition or changes to the original architecture.
