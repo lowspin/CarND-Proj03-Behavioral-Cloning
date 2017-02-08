@@ -2,7 +2,7 @@
 
 ##Background
 
-This repository contains my project report for the [Udacity Self-Driving Car nano-degree](https://www.udacity.com/drive) program's project 3 - Behavioral Cloning. The original starting files and instructions can be found [here](https://github.com/udacity/CarND-Behavioral-Cloning-P3.git). Sample training [data](https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip) provided by udacity were used, along with udacity's [driving simulator](https://d17h27t6h515a5.cloudfront.net/topher/2016/November/5831f0f7_simulator-linux/simulator-linux.zip). The project was done in Ubuntu 16.04 LTS using local Nvidia GTX960M GPU.
+This repository contains my project report for the [Udacity Self-Driving Car nano-degree](https://www.udacity.com/drive) program's project 3 - Behavioral Cloning. The original starting files and instructions can be found [here](https://github.com/udacity/CarND-Behavioral-Cloning-P3.git). Sample training [data](https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip) provided by udacity were used, along with udacity's [driving simulator](https://github.com/udacity/self-driving-car-sim). The project was done in Ubuntu 16.04 LTS using local Nvidia GTX960M GPU.
 
 ---
 
