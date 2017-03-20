@@ -188,7 +188,9 @@ I finally randomly shuffled the data set and put 20% of the data into a validati
 I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The number of epochs was chosen as 50 to balance between accuracy and speed.
 
 ### Simulation
-After training, the car was able to navigate autonomously around the track without leaving the drivable track surface. (In case there are problems loading the model into the simulator, I have uploaded a video of autonomous driving around [track 1](/res/run1.mp4).
+After training, the car was able to navigate autonomously around the track without leaving the drivable track surface. See a video of autonomous driving around [track 1](/res/run1.mp4).
+
+https://youtu.be/vdtCFkfw22U
 
 ### Experiment - Dual Frame Processing
 Since we shuffle the images random and train with them as individual samples, none of the temporal information is retained in the training data after assembly and pre-processing. For example, if the car moves from the center to the side of the lane in consecutive frame, the corresponding steering maybe to correct for unintentional swerving, but if the car has been consistently staying one side for consecutive frames and steering is postive or negative, the human driver could be "hugging the bend" while negotiating a curve. 
