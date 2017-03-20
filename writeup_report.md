@@ -1,6 +1,6 @@
-#**Behavioral Cloning Project** 
+# **Behavioral Cloning Project** 
 
-##Background
+## Background
 
 This repository contains my project report for the [Udacity Self-Driving Car nano-degree](https://www.udacity.com/drive) program's project 3 - Behavioral Cloning. The original starting files and instructions can be found [here](https://github.com/udacity/CarND-Behavioral-Cloning-P3.git). Sample training [data](https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip) provided by udacity were used, along with udacity's [driving simulator](https://github.com/udacity/self-driving-car-sim). The project was done in Ubuntu 16.04 LTS using local Nvidia GTX960M GPU.
 
@@ -26,12 +26,12 @@ The goals / steps of this project are the following:
 [image6]: ./res/Experiment_temporal_Info.png "Experimental dual frame processing"
 
 ## Rubric Points
-###Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
+### Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
 
 ---
-###Files Submitted & Code Quality
+### Files Submitted & Code Quality
 
-####1. Submission includes all required files and can be used to run the simulator in autonomous mode
+#### 1. Submission includes all required files and can be used to run the simulator in autonomous mode
 
 My project includes the following files:
 * model.py - main script to create and train the model
@@ -42,25 +42,25 @@ My project includes the following files:
 * /res/run1.mp4 - video generated from autonomous driving around track 1 (in case evaluation fails).
 * model2.py, drive2.py, model2.h5, model2.json - experimental dual-frame mode (see below)
 
-####2. Submssion includes functional code
+#### 2. Submssion includes functional code
 Using the Udacity provided simulator and my drive.py file, the car can be driven autonomously around the track by executing 
 ```sh
 python drive.py model.h5
 ```
 
-####3. Submssion code is usable and readable
+#### 3. Submssion code is usable and readable
 
 The model.py file contains the code for training and saving the convolution neural network. Keras's ImageDataGenerator was used with fit_generator to batch-generate training data rather than storing the training data in memory. The file shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works.
 
-###Model Architecture and Training Strategy
+### Model Architecture and Training Strategy
 
-####1. An appropriate model arcthiecture has been employed
+#### 1. An appropriate model arcthiecture has been employed
 
 My model is based on the original Nvidia paper ["End to End Learning for Self-Driving Cars"](https://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf). Drop-out and L2-regularization were added to prevent over-fitting. (Please see details about the final model architecture in the next section below).
 
 As this is a regression problem, the loss was defined as the mean squared error between the predicted and recorded steering angle is used as the main optimization objective.
 
-####2. Attempts to reduce overfitting in the model
+#### 2. Attempts to reduce overfitting in the model
 
 The model contains dropout layers in order to reduce overfitting (model.py lines 184). 
 
@@ -68,7 +68,7 @@ L2-Regularizers were added in each of the full-connected layers.
 
 The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
 
-####3. Model parameter tuning
+#### 3. Model parameter tuning
 
 The model used an adam optimizer, the initial learning rate was tuned manually (model.py line 192). 
 
@@ -81,7 +81,7 @@ Finally, as a balance between convergence speed and accuracy, I settled on:
 - batch size of 128,
 - 50 Epochs
 
-####4. Appropriate training data
+#### 4. Appropriate training data
 
 Initially, I collected my own training data (attached [training01.zip](training01.zip)) using the Udacity simulator on track 1. However, I found that the track has very few right bends/turns. As a result, I have to drive many round to have sufficient positive steering angle samples. I could flip the negative steering images and invert the sign of the steering angle to get more positive value samples, or drive the circuit in reverse. In the end, I chose to use the Udacity provided driving data, which has a fairly even distribution between positive and negative steering samples, to train my network.
 
@@ -89,9 +89,9 @@ Training data was chosen to keep the vehicle driving on the road. I used a combi
 
 For details about how I created the training data, see the next section. 
 
-###Model Architecture and Training Strategy
+### Model Architecture and Training Strategy
 
-####1. Solution Design Approach
+#### 1. Solution Design Approach
 
 The overall strategy for deriving a model architecture was to start with an established working model and tweak hyper-parameters. Emphasis is placed on training data selection to achieve required accuracy.
 
@@ -109,7 +109,7 @@ The final step was to run the simulator to see how well the car was driving arou
 
 At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
 
-####2. Final Model Architecture
+#### 2. Final Model Architecture
 
 The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers and layer sizes.
 
@@ -131,7 +131,7 @@ Here is the model summary of the architecture (note: visualizing the architectur
 
 ![Model Summary][image1]
 
-####3. Creation of the Training Set & Training Process
+#### 3. Creation of the Training Set & Training Process
 
 The driving data provided three different camera images, captured from three locations on the windshield. Below is a sample of the left, center and right camera images.
 
@@ -168,10 +168,10 @@ After the data selection, I have the following distribution, which seems appropr
 - right steering samples = 3220
 - approx zero steering samples = 2437
 
-####Data augmentation
+#### Data augmentation
 I have chosen not to augment the dataset, as the training samples was sufficient. The Keras ImageDataGenerator I'm using can be used to generate additional samples with e.g. horizontal flips, random rotation, shifts and whitening, but it is not clear how to adjust the y labels accordingly using the generator.
 
-####Pre-processing
+#### Pre-processing
 After the collection process, I had 8719 number of data points. I then preprocessed this data by:
 
 Cropping (model.py lines 136-144):
@@ -187,10 +187,10 @@ I finally randomly shuffled the data set and put 20% of the data into a validati
 
 I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The number of epochs was chosen as 50 to balance between accuracy and speed.
 
-###Simulation
+### Simulation
 After training, the car was able to navigate autonomously around the track without leaving the drivable track surface. (In case there are problems loading the model into the simulator, I have uploaded a video of autonomous driving around [track 1](/res/run1.mp4).
 
-###Experiment - Dual Frame Processing
+### Experiment - Dual Frame Processing
 Since we shuffle the images random and train with them as individual samples, none of the temporal information is retained in the training data after assembly and pre-processing. For example, if the car moves from the center to the side of the lane in consecutive frame, the corresponding steering maybe to correct for unintentional swerving, but if the car has been consistently staying one side for consecutive frames and steering is postive or negative, the human driver could be "hugging the bend" while negotiating a curve. 
 
 **Data Assembly**
@@ -227,16 +227,14 @@ To drive the car autonomously using udacity's simulator, execute
 python drive2.py model2.h5
 ```
 
-**Current Result**
+**Result**
 Unfortunately, the current result is worse than single frame processing. The car is not yet able to navigate the first track. I think there could be a few reasons for this:
 - the model is not optimal for this new input - more refinement is needed (maybe more layers?) than just merely scaling the number of weights,
 - Just gray-scaling the previous frame is not an optimum way to extract temporal information, may motion vectors could be better,
 - One frame is too short to have any meaningful change in the image,
+- A recurrent network model is required, added between the convolutional network and fully connect layers.
 
-**Further work**
-I will continue to fine-tune the model, or work with other input data format to improve the performance.
-
-###Reflection
+### Reflection
 The biggest lesson I learn from this project is that the deep neural network designed for any particular application is only as good as the data we feed into it. We can spend a lot of time fine-tuning the network, but if we do not select or pre-process the training data appropriately, the result is going to be inaccurate. 
 
 The second lesson I learn from the experiment is that the deep neural network model should be adapted for the input data as well. In transfer learning, we cannot expect one network that worked on another problem to work seamlessly on our current problem, without any addition or changes to the original architecture.
